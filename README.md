@@ -1,15 +1,36 @@
 # facteur-ts
 
-Transactional mailer for the Facile Suite (TypeScript) — confirmations,
-notifications, resets. Published as `@facile/facteur`; `nodemailer` is the only
-runtime dependency.
+The transactional mailer for the [Facile Suite](https://facile.studio) (TypeScript) — the SMTP
+plumbing every app that sends confirmations, notifications or resets needs, and none of them
+should be re-writing. Published as `@facile/facteur`.
 
-The Go sibling is [facteur](https://github.com/FacileStudio/facteur). Both
-implementations speak the same `SMTP_*` environment convention, so ops documents
-one set of variables.
+Every TS app in the suite already carries a copy of the same nodemailer ceremony — the
+boilerplate's `packages/email` in every fork, a divergent `packages/smtp` in Ardoise — and every
+copy re-decided the same questions: what env vars, what happens when SMTP is unset, how tests
+avoid a live server. `facteur-ts` is the single answer, plus the in-memory test seam the copies
+didn't have. The Go sibling is [facteur](https://github.com/FacileStudio/facteur); both speak
+the same `SMTP_*` environment convention, so ops documents one set of variables.
 
-Transport and message shaping only. Templates and send policy (log-and-continue
-vs fail-closed) live in the app, not here.
+Transport and message shaping only. Templates and send policy (log-and-continue vs fail-closed)
+live in the app, not here.
+
+## What it does
+
+- Sends transactional email over SMTP via nodemailer — its only runtime dependency
+- Speaks the suite's `SMTP_*` environment convention, identical names to facteur
+- Fills an empty `text` from the HTML (tags stripped) so every message carries a plain-text part
+- Uses implicit TLS on port 465, STARTTLS on other ports when offered, and plain auth only when
+  a username is set
+- Builds the transport lazily on first send, so a mailer can be constructed at module load
+- Refuses to send when SMTP is not configured — the promise rejects — and leaves the policy
+  (fatal or log-and-continue) to the app
+- Gives tests an in-memory mailer that records what would have been sent, no transport needed
+
+## Stack
+
+| Layer | Tech |
+|---|---|
+| Runtime | TypeScript 5.8, `nodemailer` — nothing else |
 
 ## Environment
 
@@ -24,8 +45,8 @@ vs fail-closed) live in the app, not here.
 ## Install
 
 ```sh
-bun add @facile/facteur          # once published to npm
-bun add github:FacileStudio/facteur-ts#main   # from git, before publish
+bun add @facile/facteur          # npm
+bun add github:FacileStudio/facteur-ts#main   # git, before publish
 ```
 
 ## Usage
@@ -42,8 +63,8 @@ await mailer.send({
 });
 ```
 
-Sending with no `SMTP_HOST` rejects with a "not configured" error. Tests use
-the in-memory seam, which needs no transport:
+Sending with no `SMTP_HOST` rejects with a "not configured" error — the app decides whether
+that is fatal or a log-and-continue. Tests use the in-memory seam:
 
 ```ts
 import { createMemoryMailer } from "@facile/facteur";
@@ -53,29 +74,11 @@ await mailer.send({ to: "a@example.com", subject: "hi", html: "<p>hi</p>" });
 mailer.messages(); // recorded messages, in send order
 ```
 
-An empty `text` is filled from the HTML (tags stripped) so every message
-carries a plain-text part.
-
-## How it works
-
-- `createMailer` is **lazy**: the nodemailer transport is built on the first
-  `send`, not at construction. You can build a mailer at module load even when
-  env isn't ready.
-- Sending with no `SMTP_HOST` **rejects at send time** — the app decides
-  whether that is fatal or a log-and-continue, instead of crashing at startup
-  or failing silently mid-flight.
-- `port: 465` gets implicit TLS; any other port starts plain and upgrades via
-  STARTTLS when the server offers it. No `SMTP_USER` ⇒ no auth.
-- Everything app-facing is the `Mailer` interface. A future provider (Resend,
-  Mailgun, …) is just another object satisfying `Mailer` — callers don't change.
-- `createMemoryMailer()` returns the same `Mailer` shape that records instead
-  of sending: same API, zero transport.
-
 ## Development
 
 ```sh
 bun test && bun run build
 ```
 
-`dist/` is committed so git installs work without a build step; run
-`bun run build` after changing `src/`.
+`dist/` is committed so git installs work without a build step; run `bun run build` after
+changing `src/`.

@@ -56,6 +56,21 @@ mailer.messages(); // recorded messages, in send order
 An empty `text` is filled from the HTML (tags stripped) so every message
 carries a plain-text part.
 
+## How it works
+
+- `createMailer` is **lazy**: the nodemailer transport is built on the first
+  `send`, not at construction. You can build a mailer at module load even when
+  env isn't ready.
+- Sending with no `SMTP_HOST` **rejects at send time** — the app decides
+  whether that is fatal or a log-and-continue, instead of crashing at startup
+  or failing silently mid-flight.
+- `port: 465` gets implicit TLS; any other port starts plain and upgrades via
+  STARTTLS when the server offers it. No `SMTP_USER` ⇒ no auth.
+- Everything app-facing is the `Mailer` interface. A future provider (Resend,
+  Mailgun, …) is just another object satisfying `Mailer` — callers don't change.
+- `createMemoryMailer()` returns the same `Mailer` shape that records instead
+  of sending: same API, zero transport.
+
 ## Development
 
 ```sh

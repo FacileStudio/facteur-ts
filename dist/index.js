@@ -1,4 +1,8 @@
 import nodemailer from "nodemailer";
+export * from "./theme.js";
+export * from "./components/layout.js";
+export * from "./templates/index.js";
+export * from "./render.js";
 /**
  * Builds a {@link MailerConfig} from the suite-wide SMTP_* variables. The
  * default port is 587 when SMTP_PORT is absent or invalid.

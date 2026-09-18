@@ -74,6 +74,31 @@ await mailer.send({ to: "a@example.com", subject: "hi", html: "<p>hi</p>" });
 mailer.messages(); // recorded messages, in send order
 ```
 
+### Template rendering
+
+`@facile/facteur` includes React Email templates and runtime rendering:
+
+```ts
+import { createMailer, fromEnv, renderTemplate } from "@facile/facteur";
+
+const { html, text } = await renderTemplate("welcome", { name: "Alice" });
+const mailer = createMailer(fromEnv());
+
+await mailer.send({
+  to: "alice@example.com",
+  subject: "Welcome to Facile",
+  html,
+  text,
+});
+```
+
+Export templates for Go:
+
+```sh
+bun run export:templates
+```
+
+
 ## Development
 
 ```sh

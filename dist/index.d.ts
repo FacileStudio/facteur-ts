@@ -1,3 +1,7 @@
+export * from "./theme.js";
+export * from "./components/layout.js";
+export * from "./templates/index.js";
+export * from "./render.js";
 /**
  * SMTP connection settings for one mailer. Mirrors the suite-wide SMTP_*
  * environment convention (see {@link fromEnv}) so ops documents one set of

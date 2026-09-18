@@ -27,7 +27,8 @@ facteur-ts/
 ## Conventions
 
 - **Env vars**: `SMTP_HOST`, `SMTP_PORT` (default 587), `SMTP_USER`, `SMTP_PASS`,
-  `SMTP_FROM`. Identical names in facteur — one ops doc.
+  `SMTP_FROM`, `SMTP_LOGGER`, `SMTP_DEBUG` (both optional, `true`/`1`, map to
+  nodemailer's `logger`/`debug` transport options). Identical names in facteur — one ops doc.
 - **No host configured ⇒ refuse, don't swallow**: send rejects with a
   "not configured" error. The app decides log-and-continue vs fail-closed.
 - **Test seam**: `createMemoryMailer()` records messages instead of sending.

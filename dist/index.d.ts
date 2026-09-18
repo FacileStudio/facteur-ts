@@ -13,6 +13,10 @@ export interface MailerConfig {
     user?: string;
     pass?: string;
     from: string;
+    /** Logs transport activity (nodemailer's `logger` option). */
+    logger?: boolean;
+    /** Logs SMTP protocol traffic (nodemailer's `debug` option). */
+    debug?: boolean;
 }
 /** One outgoing email. */
 export interface Message {

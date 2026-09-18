@@ -15,6 +15,10 @@ export interface MailerConfig {
   user?: string;
   pass?: string;
   from: string;
+  /** Logs transport activity (nodemailer's `logger` option). */
+  logger?: boolean;
+  /** Logs SMTP protocol traffic (nodemailer's `debug` option). */
+  debug?: boolean;
 }
 
 /** One outgoing email. */
@@ -49,7 +53,13 @@ export function fromEnv(
     user: env.SMTP_USER,
     pass: env.SMTP_PASS,
     from: env.SMTP_FROM ?? "",
+    logger: isTruthy(env.SMTP_LOGGER),
+    debug: isTruthy(env.SMTP_DEBUG),
   };
+}
+
+function isTruthy(value: string | undefined): boolean {
+  return value === "true" || value === "1";
 }
 
 /**
@@ -69,6 +79,8 @@ export function createMailer(config: MailerConfig): Mailer {
         auth: config.user
           ? { user: config.user, pass: config.pass ?? "" }
           : undefined,
+        logger: config.logger,
+        debug: config.debug,
       });
     }
     return transport;

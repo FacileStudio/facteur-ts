@@ -15,7 +15,12 @@ export function fromEnv(env = process.env) {
         user: env.SMTP_USER,
         pass: env.SMTP_PASS,
         from: env.SMTP_FROM ?? "",
+        logger: isTruthy(env.SMTP_LOGGER),
+        debug: isTruthy(env.SMTP_DEBUG),
     };
+}
+function isTruthy(value) {
+    return value === "true" || value === "1";
 }
 /**
  * Creates a Mailer that sends over SMTP. Sending without a configured host
@@ -33,6 +38,8 @@ export function createMailer(config) {
                 auth: config.user
                     ? { user: config.user, pass: config.pass ?? "" }
                     : undefined,
+                logger: config.logger,
+                debug: config.debug,
             });
         }
         return transport;

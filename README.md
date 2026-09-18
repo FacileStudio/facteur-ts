@@ -41,6 +41,8 @@ live in the app, not here.
 | `SMTP_USER` | Username (optional; empty = no auth) |
 | `SMTP_PASS` | Password |
 | `SMTP_FROM` | From address, e.g. `noreply@facile.studio` |
+| `SMTP_LOGGER` | `true`/`1` logs transport activity (nodemailer's `logger` option) |
+| `SMTP_DEBUG` | `true`/`1` logs SMTP protocol traffic (nodemailer's `debug` option) |
 
 ## Install
 

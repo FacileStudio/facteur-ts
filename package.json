@@ -1,6 +1,6 @@
 {
   "name": "@facile/facteur",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Transactional mailer for the Facile Suite — SMTP transport, suite-wide env convention, in-memory test seam",
   "type": "module",
   "main": "./dist/index.js",

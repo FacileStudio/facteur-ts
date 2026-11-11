@@ -109,3 +109,7 @@ bun test && bun run build
 
 `dist/` is committed so git installs work without a build step; run `bun run build` after
 changing `src/`.
+
+## License
+
+facteur is licensed under the MIT License; see [LICENSE](LICENSE).
